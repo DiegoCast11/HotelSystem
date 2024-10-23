@@ -1,21 +1,19 @@
 package server
 
 import (
+	"Hotelsystem/api/controllers"
 	"database/sql"
-	"encoding/json"
-	"net/http"
-
-	"Hotelsystem/pkg/models"
 
 	"github.com/gorilla/mux"
 )
 
+// Server representa la estructura del servidor.
 type Server struct {
 	router *mux.Router
 	db     *sql.DB
 }
 
-// Nueva instancia del servidor
+// NewServer crea una nueva instancia del servidor.
 func NewServer(db *sql.DB) *Server {
 	s := &Server{
 		router: mux.NewRouter(),
@@ -27,34 +25,12 @@ func NewServer(db *sql.DB) *Server {
 
 // Manejador de rutas
 func (s *Server) routes() {
-	s.router.HandleFunc("/rooms", s.getRooms).Methods("GET")
-}
-
-// Manejador para obtener habitaciones
-func (s *Server) getRooms(w http.ResponseWriter, r *http.Request) {
-	rows, err := s.db.Query("SELECT roomId, roomName, type, description, capacity, dimensions FROM rooms")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer rows.Close()
-
-	var rooms []models.Room // Usa el struct Room del paquete models
-	for rows.Next() {
-		var room models.Room
-		if err := rows.Scan(&room.RoomID, &room.RoomName, &room.Type, &room.Description, &room.Capacity, &room.Dimensions); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		rooms = append(rooms, room) // Agrega la habitación al slice
-	}
-
-	// Devuelve la respuesta como JSON
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(rooms)
+	// Aquí registrarías las rutas
+	controllers.SetDB(s.db)
+	s.router.HandleFunc("/rooms", controllers.GetRooms).Methods("GET")
 }
 
 // Obtener el enrutador
-func (s *Server) Router() http.Handler {
+func (s *Server) Router() *mux.Router {
 	return s.router
 }

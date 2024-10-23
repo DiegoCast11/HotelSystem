@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"Hotelsystem/pkg/server" // Inicializa el servidor
-
+	"Hotelsystem/api/routes"        // Configura las rutas
 	"Hotelsystem/internal/database" // Conectar a la BD
+	"Hotelsystem/pkg/server"        // Inicializa el servidor
 )
 
 func main() {
@@ -19,6 +19,9 @@ func main() {
 
 	// Inicializar servidor
 	s := server.NewServer(db)
+
+	// Configurar rutas
+	routes.RegisterRoutes(s.Router())
 
 	// Iniciar servidor HTTP
 	log.Println("Servidor corriendo en :8080")
