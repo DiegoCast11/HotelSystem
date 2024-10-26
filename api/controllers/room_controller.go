@@ -2,22 +2,14 @@ package controllers
 
 import (
 	"Hotelsystem/api/models"
-	"database/sql"
+	"Hotelsystem/internal/database"
 	"encoding/json"
 	"net/http"
 )
 
-// db es una conexión a la base de datos.
-var db *sql.DB
-
-// SetDB establece la conexión a la base de datos.
-func SetDB(database *sql.DB) {
-	db = database
-}
-
 // GetRooms obtiene la lista de habitaciones y la devuelve como JSON.
 func GetRooms(w http.ResponseWriter, r *http.Request) {
-	rows, err := db.Query("SELECT roomId, roomName, type, description, capacity, dimensions FROM rooms")
+	rows, err := database.DB.Query("SELECT roomId, roomName, type, description, capacity, dimensions FROM rooms")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

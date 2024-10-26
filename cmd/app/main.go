@@ -17,6 +17,8 @@ func main() {
 	}
 	defer db.Close()
 
+	database.SetDB(db)
+
 	// Inicializar servidor
 	s := server.NewServer(db)
 

@@ -1,7 +1,7 @@
 package server
 
 import (
-	"Hotelsystem/api/controllers"
+	"Hotelsystem/api/routes"
 	"database/sql"
 
 	"github.com/gorilla/mux"
@@ -15,6 +15,7 @@ type Server struct {
 
 // NewServer crea una nueva instancia del servidor.
 func NewServer(db *sql.DB) *Server {
+	// Conectar a la base de datos
 	s := &Server{
 		router: mux.NewRouter(),
 		db:     db,
@@ -25,9 +26,8 @@ func NewServer(db *sql.DB) *Server {
 
 // Manejador de rutas
 func (s *Server) routes() {
-	// Aquí registrarías las rutas
-	controllers.SetDB(s.db)
-	s.router.HandleFunc("/rooms", controllers.GetRooms).Methods("GET")
+	// Registrar rutas del controlador
+	routes.RegisterRoutes(s.router)
 }
 
 // Obtener el enrutador

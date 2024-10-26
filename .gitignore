@@ -26,3 +26,6 @@ go.work.sum
 
 # Output of go tool trace
 /tmp
+
+#google firebase service account
+sanfelipehotel-83ae3-firebase-adminsdk-2mpje-e444d2af98.json
