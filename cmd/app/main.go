@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"Hotelsystem/api/routes"        // Configura las rutas
 	"Hotelsystem/internal/database" // Conectar a la BD
@@ -25,7 +26,13 @@ func main() {
 	// Configurar rutas
 	routes.RegisterRoutes(s.Router())
 
+	// Obtener el puerto del entorno
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	// Iniciar servidor HTTP
-	log.Println("Servidor corriendo en :8080")
-	log.Fatal(http.ListenAndServe(":8080", s.Router()))
+	log.Printf("Servidor corriendo en :%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, s.Router()))
 }
