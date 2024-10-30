@@ -2,16 +2,13 @@ package controllers
 
 import (
 	"Hotelsystem/api/models"
-	"Hotelsystem/firebase"
-	"Hotelsystem/internal/database"
-	"database/sql"
+	"Hotelsystem/internal/repository"
 	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
-// CreateCustomer maneja la creación de un cliente.
 // CreateCustomer maneja la creación de un cliente.
 func CreateCustomer(w http.ResponseWriter, r *http.Request) {
 	var customer models.Customer
@@ -21,32 +18,10 @@ func CreateCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Verificar si el número de teléfono ya está registrado
-	var existingPhone string
-	queryCheck := "SELECT phone FROM customers WHERE phone = ?"
-	err = database.DB.QueryRow(queryCheck, customer.Phone).Scan(&existingPhone)
-	if err != nil && err != sql.ErrNoRows {
-		http.Error(w, "Error al consultar la base de datos", http.StatusInternalServerError)
-		return
-	}
-
-	if existingPhone != "" {
-		http.Error(w, "Error! Teléfono ya registrado", http.StatusConflict) // 409 Conflict
-		return
-	}
-
-	// Insertar cliente a la base de datos
-	query := "INSERT INTO customers (name, email, phone, registrydate) VALUES (?, ?, ?, ?)"
-	result, err := database.DB.Exec(query, customer.Name, customer.Email, customer.Phone, customer.RegistryDate)
+	// Llamar al repositorio para crear el cliente
+	customerID, err := repository.CreateCustomer(&customer)
 	if err != nil {
-		http.Error(w, "Error al insertar el cliente en la base de datos", http.StatusInternalServerError)
-		return
-	}
-
-	// Obtener el ID del cliente recién insertado
-	customerID, err := result.LastInsertId()
-	if err != nil {
-		http.Error(w, "Error al obtener el ID del cliente insertado", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -61,8 +36,7 @@ func CreateCustomer(w http.ResponseWriter, r *http.Request) {
 // VerifyCustomerPhone verifica el token del teléfono y actualiza la base de datos.
 func VerifyCustomerPhone(w http.ResponseWriter, r *http.Request) {
 	type VerifyRequest struct {
-		CustomerID int    `json:"customerId"`
-		Token      string `json:"token"`
+		Phone string `json:"Phone"`
 	}
 
 	var req VerifyRequest
@@ -71,9 +45,10 @@ func VerifyCustomerPhone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// verifica token y actualiza campo en bd
-	if err := firebase.VerifyPhoneToken(database.DB, req.Token, req.CustomerID); err != nil {
-		http.Error(w, "Error al verificar el token de teléfono", http.StatusInternalServerError)
+	err := repository.UpdatePhoneVerification(req.Phone)
+
+	if err != nil {
+		http.Error(w, "Error al verificar el teléfono", http.StatusInternalServerError)
 		return
 	}
 
@@ -87,11 +62,9 @@ func VerifyCustomerPhone(w http.ResponseWriter, r *http.Request) {
 func GetCustomerByPhone(w http.ResponseWriter, r *http.Request) {
 	phone := mux.Vars(r)["phone"]
 
-	var customer models.Customer
-	query := "SELECT customerid, name, email, phone, registrydate, phone_verified FROM customers WHERE phone = ?"
-	err := database.DB.QueryRow(query, phone).Scan(&customer.CustomerID, &customer.Name, &customer.Email, &customer.Phone, &customer.RegistryDate, &customer.Phone_verified)
+	customer, err := repository.GetCustomerByPhone(phone)
 	if err != nil {
-		http.Error(w, "Error al consultar la base de datos", http.StatusInternalServerError)
+		http.Error(w, "Error al obtener el cliente", http.StatusInternalServerError)
 		return
 	}
 
