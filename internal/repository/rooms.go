@@ -11,7 +11,7 @@ func FetchRooms() ([]models.Room, error) {
 	var rooms []models.Room
 	// Consulta para obtener las habitaciones con su tipo correspondiente
 	query := `
-		SELECT r.roomId, r.roomName, rt.description AS type, r.roomTypeId
+		SELECT r.roomId, r.roomName, rt.description AS description, r.roomTypeId, rt.roomtype AS roomtype
 		FROM rooms r
 		JOIN room_types rt ON r.roomTypeId = rt.roomTypeId
 	`
@@ -24,7 +24,7 @@ func FetchRooms() ([]models.Room, error) {
 	// Itera sobre los resultados y llena el slice de rooms
 	for rows.Next() {
 		var room models.Room
-		err := rows.Scan(&room.RoomID, &room.RoomName, &room.Type, &room.RoomTypeID)
+		err := rows.Scan(&room.RoomID, &room.RoomName, &room.Description, &room.RoomTypeID, &room.Type)
 		if err != nil {
 			return nil, errors.New("error al escanear los resultados de las habitaciones")
 		}
