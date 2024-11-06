@@ -20,8 +20,8 @@ func CreateCustomer(customer *models.Customer) (int64, error) {
 	}
 
 	// Insertar cliente en la base de datos
-	query := "INSERT INTO customers (name, email, phone, registrydate) VALUES (?, ?, ?, ?)"
-	result, err := database.DB.Exec(query, customer.Name, customer.Email, customer.Phone, customer.RegistryDate)
+	query := "INSERT INTO customers (name, email, phone) VALUES (?, ?, ?)"
+	result, err := database.DB.Exec(query, customer.Name, customer.Email, customer.Phone)
 	if err != nil {
 		return 0, errors.New("error al insertar el cliente en la base de datos")
 	}
