@@ -13,9 +13,11 @@ import (
 // Función para conectar a la base de datos
 func ConnectDB() (*sql.DB, error) {
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error al cargar el archivo .env")
+	if os.Getenv("ENV") != "production" { // Asume que ENV se configura como "production" en Heroku
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error al cargar el archivo .env")
+		}
 	}
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
