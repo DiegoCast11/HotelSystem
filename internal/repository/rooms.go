@@ -7,13 +7,18 @@ import (
 )
 
 // FetchRooms obtiene todas las habitaciones de la base de datos junto con las imágenes asociadas
-func FetchRooms() ([]models.Room, error) {
-	var rooms []models.Room
+func FetchRooms() ([]models.RoomType, error) {
+	var rooms []models.RoomType
 	// Consulta para obtener las habitaciones con su tipo correspondiente
-	query := `
-		SELECT r.roomId, r.roomName, rt.description AS description, r.roomTypeId, rt.roomtype AS roomtype
-		FROM rooms r
-		JOIN room_types rt ON r.roomTypeId = rt.roomTypeId
+	query := `	
+		SELECT
+			r.roomTypeId, r.roomtype, r.description, r.capacity, r.dimensions, c.price
+		FROM room_types r
+		JOIN costs c ON r.roomTypeId = c.roomTypeId
+		WHERE
+			c.startDate <= CURDATE() AND
+			(c.lastDate >= CURDATE() OR c.lastDate IS NULL)
+		GROUP BY r.roomTypeId;
 	`
 	rows, err := database.DB.Query(query)
 	if err != nil {
@@ -23,8 +28,8 @@ func FetchRooms() ([]models.Room, error) {
 
 	// Itera sobre los resultados y llena el slice de rooms
 	for rows.Next() {
-		var room models.Room
-		err := rows.Scan(&room.RoomID, &room.RoomName, &room.Description, &room.RoomTypeID, &room.Type)
+		var room models.RoomType
+		err := rows.Scan(&room.RoomTypeId, &room.RoomType, &room.Description, &room.Capacity, &room.Dimensions, &room.Price)
 		if err != nil {
 			return nil, errors.New("error al escanear los resultados de las habitaciones")
 		}
@@ -35,7 +40,7 @@ func FetchRooms() ([]models.Room, error) {
 			FROM room_images
 			WHERE roomTypeId = ?
 		`
-		imageRows, err := database.DB.Query(imagesQuery, room.RoomTypeID)
+		imageRows, err := database.DB.Query(imagesQuery, room.RoomTypeId)
 		if err != nil {
 			return nil, errors.New("error al ejecutar la consulta para obtener las imágenes")
 		}
