@@ -34,7 +34,7 @@ func NewServer(db *sql.DB) *Server {
 // Configuración de CORS
 func configureCORS() *cors.Cors {
 	return cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "https://tu-dominio-produccion.com"},
+		AllowedOrigins:   []string{"http://localhost:3000", "https://sf-project-one.vercel.app"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
