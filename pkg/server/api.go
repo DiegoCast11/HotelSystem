@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 // Server representa la estructura del servidor.
@@ -21,7 +22,23 @@ func NewServer(db *sql.DB) *Server {
 		db:     db,
 	}
 	s.routes() // Definir rutas
+
+	// Configurar CORS
+	corsHandler := configureCORS()
+
+	// Aplica el middleware de CORS al enrutador
+	s.router.Use(corsHandler.Handler)
 	return s
+}
+
+// Configuración de CORS
+func configureCORS() *cors.Cors {
+	return cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000", "https://tu-dominio-produccion.com"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	})
 }
 
 // Manejador de rutas
