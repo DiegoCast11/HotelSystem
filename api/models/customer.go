@@ -8,4 +8,5 @@ type Customer struct {
 	Phone          string `json:"phone"`
 	RegistryDate   string `json:"registryDate"`
 	Phone_verified bool   `json:"phone_verified"`
+	Password       string `json:"password"`
 }

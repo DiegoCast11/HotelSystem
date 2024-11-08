@@ -3,6 +3,7 @@ package controllers
 import (
 	"Hotelsystem/api/models"
 	"Hotelsystem/internal/repository"
+	"Hotelsystem/services"
 	"encoding/json"
 	"net/http"
 
@@ -17,6 +18,13 @@ func CreateCustomer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al decodificar el cuerpo de la solicitud", http.StatusBadRequest)
 		return
 	}
+
+	hash, err := services.HashPassword(customer.Password)
+	if err != nil {
+		http.Error(w, "error al encriptar la contraseña", http.StatusInternalServerError)
+		return
+	}
+	customer.Password = hash
 
 	// Llamar al repositorio para crear el cliente
 	customerID, err := repository.CreateCustomer(&customer)

@@ -20,8 +20,8 @@ func CreateCustomer(customer *models.Customer) (int64, error) {
 	}
 
 	// Insertar cliente en la base de datos
-	query := "INSERT INTO customers (name, email, phone) VALUES (?, ?, ?)"
-	result, err := database.DB.Exec(query, customer.Name, customer.Email, customer.Phone)
+	query := "INSERT INTO customers (name, email, phone, password) VALUES (?, ?, ?, ?)"
+	result, err := database.DB.Exec(query, customer.Name, customer.Email, customer.Phone, customer.Password)
 	if err != nil {
 		return 0, errors.New("error al insertar el cliente en la base de datos")
 	}
@@ -73,4 +73,14 @@ func GetCustomerByPhone(phone string) (*models.Customer, error) {
 	}
 
 	return &customer, nil
+}
+
+func GetUserByEmail(email string) (models.User, error) {
+	var user models.User
+	query := `SELECT customerId, email, password FROM customers WHERE email = ?`
+	err := database.DB.QueryRow(query, email).Scan(&user.UserID, &user.Email, &user.Password)
+	if err != nil {
+		return models.User{}, errors.New("usuario no encontrado")
+	}
+	return user, nil
 }
