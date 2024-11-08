@@ -12,4 +12,5 @@ func RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/customers", controllers.CreateCustomer).Methods("POST")
 	router.HandleFunc("/customers/verify-phone", controllers.VerifyCustomerPhone).Methods("POST")
 	router.HandleFunc("/customers/{phone}", controllers.GetCustomerByPhone).Methods("GET")
+	router.HandleFunc("/availability", controllers.CheckAvailability).Methods("GET")
 }
