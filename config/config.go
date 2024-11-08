@@ -8,9 +8,11 @@ import (
 )
 
 func GetJWTSecret() string {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if os.Getenv("ENV") != "production" { // Asume que ENV se configura como "production" en Heroku
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error al cargar el archivo .env")
+		}
 	}
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
