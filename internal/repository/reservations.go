@@ -42,3 +42,28 @@ func CheckAvailability() ([]models.ReservationResponse, error) {
 	return reservations, nil
 
 }
+
+func CountPendingReservations(userID int) (int, error) {
+	var count int
+	query := "SELECT COUNT(*) FROM reservations WHERE customerid = ? AND state = 0"
+
+	err := database.DB.QueryRow(query, userID).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+// Crea una nueva reserva en la base de datos
+func CreateReservation(reservation *models.Reservation) error {
+	query := `INSERT INTO reservations (customerid, roomId, checkin, checkout, totalAmount) 
+			  VALUES (?, ?, ?, ?, ?)`
+
+	_, err := database.DB.Exec(query, reservation.CustomerID, reservation.RoomID, reservation.CheckIn, reservation.CheckOut, reservation.TotalAmount)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

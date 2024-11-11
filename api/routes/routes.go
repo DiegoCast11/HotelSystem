@@ -20,7 +20,6 @@ func RegisterRoutes(router *mux.Router) {
 	privateRouter := router.PathPrefix("/").Subrouter()
 	privateRouter.Use(middleware.AuthMiddleware)
 
-	// Ruta privada (requiere autenticación)
-	//ejemplo de ruta privada
-	//privateRouter.HandleFunc("/availability", controllers.CheckAvailability).Methods("GET")
+	// Rutas privadas
+	privateRouter.HandleFunc("/reservations", controllers.CreateReservation).Methods("POST")
 }

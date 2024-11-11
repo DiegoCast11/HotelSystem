@@ -5,6 +5,7 @@ import (
 	"Hotelsystem/internal/database"
 	"database/sql"
 	"errors"
+	"fmt"
 )
 
 func CreateCustomer(customer *models.Customer) (int64, error) {
@@ -83,4 +84,16 @@ func GetUserByEmail(email string) (models.User, error) {
 		return models.User{}, errors.New("usuario no encontrado")
 	}
 	return user, nil
+}
+
+func IsPhoneVerified(userID int) (bool, error) {
+	var phoneVerified bool
+	query := "SELECT phone_verified FROM customers WHERE customerId = ?"
+	err := database.DB.QueryRow(query, userID).Scan(&phoneVerified)
+	if err == sql.ErrNoRows {
+		return false, fmt.Errorf("usuario no encontrado")
+	} else if err != nil {
+		return false, err
+	}
+	return phoneVerified, nil
 }
