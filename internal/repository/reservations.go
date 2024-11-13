@@ -60,10 +60,16 @@ func CreateReservation(reservation *models.Reservation) error {
 	query := `INSERT INTO reservations (customerid, roomId, checkin, checkout, totalAmount) 
 			  VALUES (?, ?, ?, ?, ?)`
 
-	_, err := database.DB.Exec(query, reservation.CustomerID, reservation.RoomID, reservation.CheckIn, reservation.CheckOut, reservation.TotalAmount)
+	result, err := database.DB.Exec(query, reservation.CustomerID, reservation.RoomID, reservation.CheckIn, reservation.CheckOut, reservation.TotalAmount)
 	if err != nil {
 		return err
 	}
+	// Obtener el ID de la última inserción
+	lastInsertId, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	reservation.ReservationID = int(lastInsertId)
 
 	return nil
 }
