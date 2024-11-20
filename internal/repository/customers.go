@@ -9,7 +9,7 @@ import (
 )
 
 func CreateCustomer(customer *models.Customer) (int64, error) {
-	// Verificar si el número de teléfono ya está registrado
+
 	var existingPhone string
 	queryCheck := "SELECT phone FROM customers WHERE phone = ?"
 	err := database.DB.QueryRow(queryCheck, customer.Phone).Scan(&existingPhone)
@@ -18,6 +18,17 @@ func CreateCustomer(customer *models.Customer) (int64, error) {
 	}
 	if existingPhone != "" {
 		return 0, errors.New("error! teléfono ya registrado")
+	}
+
+	// Check if the email is already registered
+	var existingEmail string
+	queryCheckEmail := "SELECT email FROM customers WHERE email = ?"
+	err = database.DB.QueryRow(queryCheckEmail, customer.Email).Scan(&existingEmail)
+	if err != nil && err != sql.ErrNoRows {
+		return 0, errors.New("error al verificar el correo electrónico")
+	}
+	if existingEmail != "" {
+		return 0, errors.New("error! correo electrónico ya registrado")
 	}
 
 	// Insertar cliente en la base de datos
